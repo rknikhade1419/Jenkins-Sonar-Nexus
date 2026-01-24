@@ -15,7 +15,7 @@
 
 resource "aws_instance" "sonar-server" {   # we are creating a new instance for jenkins-server
     ami = data.aws_ami.latest.id    # we are using the latest ami that we fetched earlier
-    instance_type = "t3.medium"     # This is the type of the instance we are creating
+    instance_type = "c7i-flex.large"     # This is the type of the instance we are creating
     subnet_id = aws_subnet.our-public-subnet.id   # this is the id of the subnet we are using to launch the instance
     user_data = file("./sonar-server.sh")  # this is the script that will be executed during the creation of the instance
     key_name = "terraform" # this is the key name that we have created in console

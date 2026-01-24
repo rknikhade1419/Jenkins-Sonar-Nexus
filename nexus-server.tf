@@ -3,7 +3,7 @@
 #################################################################################################################
 
 
-data "aws_ami" "latest" {     # aws_ami helps to get AMI ID of the os
+data "aws_ami" "nexus-latest" {     # aws_ami helps to get AMI ID of the os
     most_recent = true  # this is the filter for most recent Ami
    
     filter {   # this is the filter for virtualization type
@@ -58,11 +58,11 @@ data "aws_ami" "latest" {
 # Creating EC2 instance out of this latest AMI
 ###########################################################################################################
 
-resource "aws_instance" "jenkins-server" {   # we are creating a new instance for jenkins-server
-    ami = data.aws_ami.latest.id    # we are using the latest ami that we fetched earlier
-    instance_type = "t3.medium"     # This is the type of the instance we are creating
+resource "aws_instance" "nexus-server" {   # we are creating a new instance for nexus-server
+    ami = data.aws_ami.nexus-latest.id    # we are using the latest ami that we fetched earlier
+    instance_type = "c7i-flex.large"     # This is the type of the instance we are creating
     subnet_id = aws_subnet.our-public-subnet.id   # this is the id of the subnet we are using to launch the instance
-    user_data = file("./jenkins-server.sh")  # this is the script that will be executed during the creation of the instance
+    user_data = file("./nexus-server.sh")  # this is the script that will be executed during the creation of the instance
     key_name = "terraform" # this is the key name that we have created in console
     iam_instance_profile = aws_iam_instance_profile.our-instance-profile.name
     security_groups = [aws_security_group.our-security-group.id] # this is security grp in which we have openend ports
@@ -71,7 +71,7 @@ resource "aws_instance" "jenkins-server" {   # we are creating a new instance fo
     }
 
     tags = {
-        Name = "jenkins-server"  # this will provide name to instance 
+        Name = "nexus-server"  # this will provide name to instance 
     }
 }
 
