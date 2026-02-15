@@ -1,77 +1,44 @@
-################################################################################################################################################################################################################################################################################################################################
-# Fetching latest AMI ID of ubuntu 22.04
-#################################################################################################################
-
-
-data "aws_ami" "nexus-latest" {     # aws_ami helps to get AMI ID of the os
-    most_recent = true  # this is the filter for most recent Ami
-   
-    filter {   # this is the filter for virtualization type
-      name = "virtualization-type"
+###########################################################################################
+# Fetching latest AMI ID of Ubuntu 22.04
+###########################################################################################
+data "aws_ami" "nexus-latest" {
+    most_recent = true
+    filter {
+      name   = "virtualization-type"
       values = ["hvm"]
     }
-    filter {  # this is the filter for AMI name of the OS which can be found in AMI section in EC2
-        name = "name"
+    filter {
+        name   = "name"
         values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
     }
-     owners = ["099720109477"]  # this is the owner of the OS, which can be found in AMI section in EC2
+    owners = ["099720109477"] # Canonical
 }
 
-
-################################################################################################################################################################################################################################################################################################################################################################################################
-# Fetching latest AMI ID of Debian 12
-################################################################################################################################################################################################################################################################################################################################################################
-/*
-data "aws_ami" "latest" {
-    most_recent = true
-   
-    filter {
-      name = "architecture"
-      values = ["x86_64"]
-    }
-    filter {
-        name = "name"
-        values = ["debian-12-amd64-*-*"]
-    }
-     owners = ["136693071363"]
-}
-*/
-##################################################################################################################
-# Fetching latest AMI ID of Amazon linux 2023
-##################################################################################################################
-/*
-data "aws_ami" "latest" {
-    most_recent = true
-   
-    filter {
-      name = "architecture"
-      values = ["x86_64"]
-    }
-    filter {
-        name = "name"
-        values = ["al2023-ami-*-kernel-*-x86_64"]
-    }
-    owners = ["137112412989"]
-}
-*/
-###########################################################################################################
-# Creating EC2 instance out of this latest AMI
-###########################################################################################################
-
-resource "aws_instance" "nexus-server" {   # we are creating a new instance for nexus-server
-    ami = data.aws_ami.nexus-latest.id    # we are using the latest ami that we fetched earlier
-    instance_type = "c7i-flex.large"     # This is the type of the instance we are creating
-    subnet_id = aws_subnet.our-public-subnet.id   # this is the id of the subnet we are using to launch the instance
-    user_data = file("./nexus-server.sh")  # this is the script that will be executed during the creation of the instance
-    key_name = "Jenkins-Sonar-Nexus" # this is the key name that we have created in console
+###########################################################################################
+# Creating EC2 instance for Nexus Repository Manager
+###########################################################################################
+resource "aws_instance" "nexus-server" {
+    ami           = data.aws_ami.nexus-latest.id
+    instance_type = "c7i-flex.large" # Optimized 2 vCPU, 4GB RAM
+    
+    # Use the public subnet so we can access the UI
+    subnet_id     = aws_subnet.our-public-subnet.id 
+    
+    # Updated to the specific Nexus Security Group you created
+    vpc_security_group_ids = [aws_security_group.our-security-group-for-nexus.id] 
+    
+    user_data            = file("./nexus-server.sh")
+    key_name             = "Jenkins-Sonar-Nexus"
     iam_instance_profile = aws_iam_instance_profile.our-instance-profile.name
-    security_groups = [aws_security_group.our-security-group.id] # this is security grp in which we have openend ports
+
     root_block_device {
       volume_size = 20
+      volume_type = "gp3" # Faster and cheaper for 2026
     }
 
     tags = {
-        Name = "nexus-server"  # this will provide name to instance 
+        Name        = "nexus-server"
+        Project     = "E-commerce-DevSecOps"
+        Environment = var.environment
     }
 }
-
