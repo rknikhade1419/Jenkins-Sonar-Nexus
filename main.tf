@@ -252,4 +252,56 @@ resource "aws_security_group" "our-Security-Group-for-sonar" { # This will creat
     cidr_blocks = ["0.0.0.0/0"] # anywhere ipv4
     ipv6_cidr_blocks = ["::/0"] # anywhere ipv6
   }
+
+########################################################################################
+# AWS EC2 INSTANCE CREATION (Updated to 7th Gen Flex)
+########################################################################################
+
+# 1. Jenkins Server (Upgraded to m7i-flex for 8GB RAM)
+resource "aws_instance" "jenkins-server" {
+  ami                    = var.ami_id 
+  instance_type          = "m7i-flex.large" # 2 vCPU, 8GB RAM
+  key_name               = var.key_name
+  subnet_id              = aws_subnet.our-public-subnet.id
+  vpc_security_group_ids = [aws_security_group.our-security-group.id]
+  
+  user_data = file("install_jenkins.sh")
+
+  tags = {
+    Name        = "Jenkins-Server"
+    Environment = var.environment
+  }
+}
+
+# 2. Nexus Server (Updated to c7i-flex for 4GB RAM)
+resource "aws_instance" "nexus-server" {
+  ami                    = var.ami_id
+  instance_type          = "c7i-flex.large" # 2 vCPU, 4GB RAM
+  key_name               = var.key_name
+  subnet_id              = aws_subnet.our-public-subnet2.id
+  vpc_security_group_ids = [aws_security_group.our-security-group-for-nexus.id]
+  
+  user_data = file("install_nexus.sh")
+
+  tags = {
+    Name        = "Nexus-Server"
+    Environment = var.environment
+  }
+}
+
+# 3. SonarQube Server (Upgraded to m7i-flex for 8GB RAM)
+resource "aws_instance" "sonar-server" {
+  ami                    = var.ami_id
+  instance_type          = "m7i-flex.large" # 2 vCPU, 8GB RAM
+  key_name               = var.key_name
+  subnet_id              = aws_subnet.our-public-subnet.id
+  vpc_security_group_ids = [aws_security_group.our-Security-Group-for-sonar.id]
+  
+  user_data = file("install_sonar.sh")
+
+  tags = {
+    Name        = "Sonar-Server"
+    Environment = var.environment
+  }
+}
 }
