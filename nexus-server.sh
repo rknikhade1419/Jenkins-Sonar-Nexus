@@ -1,4 +1,4 @@
-#!/bin/bash  
+/* #!/bin/bash  
 
 ###############################################################################################################
 #                   Docker Installation
@@ -22,4 +22,15 @@
 apt update -y
 apt install -y docker.io 
 
+docker run -d -p 8081:8081 --name nexus-server sonatype/nexus3 */
+
+#!/bin/bash
+# ... (Your Docker install steps) ...
+apt update -y
+apt install -y docker.io 
+# CRITICAL: Increase Virtual Memory for Elasticsearch
+sysctl -w vm.max_map_count=262144
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+
+# Run SonarQube
 docker run -d -p 8081:8081 --name nexus-server sonatype/nexus3
