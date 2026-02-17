@@ -22,6 +22,8 @@ resource "aws_internet_gateway" "our-igw" { # "aws_internet_gateway" will help t
   }
 }
 
+
+
 ########################################################################################
 # NAT GATEWAY (Required for Private Subnets)
 ########################################################################################
