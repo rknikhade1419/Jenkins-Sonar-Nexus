@@ -23,6 +23,46 @@ resource "aws_internet_gateway" "our-igw" { # "aws_internet_gateway" will help t
 }
 
 ########################################################################################
+# NAT GATEWAY (Required for Private Subnets)
+########################################################################################
+
+# 1. Allocate Elastic IP for NAT
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+# 2. Create NAT Gateway in Public Subnet
+resource "aws_nat_gateway" "our-nat-gw" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.our-public-subnet.id  # Must be in Public Subnet
+
+  tags = {
+    Name        = "Our-NAT-Gateway"
+    Environment = var.environment
+  }
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  depends_on = [aws_internet_gateway.our-igw]
+}
+
+# 3. UPDATE Private Route Tables to point to NAT Gateway
+# (Currently, your private route tables have NO routes to the internet)
+
+resource "aws_route" "our-private-route" {
+  route_table_id         = aws_route_table.our-private-route-table.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.our-nat-gw.id
+}
+
+resource "aws_route" "our-private-route2" {
+  route_table_id         = aws_route_table.our-private-route-table2.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.our-nat-gw.id
+}
+
+
+
+########################################################################################
 # AWS SUBNET CREATION
 ########################################################################################
 
@@ -303,5 +343,5 @@ resource "aws_instance" "sonar-server" {
     Name        = "Sonar-Server"
     Environment = var.environment
   }
+} 
 } */
-}
