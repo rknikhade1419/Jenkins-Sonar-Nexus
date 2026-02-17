@@ -33,4 +33,5 @@ sysctl -w vm.max_map_count=262144
 echo "vm.max_map_count=262144" >> /etc/sysctl.conf
 
 # Run SonarQube
-docker run -d -p 8081:8081 --name nexus-server sonatype/nexus3
+
+docker run -d -p 8081:8081 -v nexus-data:/nexus-data sonatype/nexus3
