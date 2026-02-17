@@ -253,7 +253,7 @@ resource "aws_security_group" "our-Security-Group-for-sonar" { # This will creat
     ipv6_cidr_blocks = ["::/0"] # anywhere ipv6
   }
 
-########################################################################################
+/* ########################################################################################
 # AWS EC2 INSTANCE CREATION (Updated to 7th Gen Flex)
 ########################################################################################
 
@@ -303,5 +303,5 @@ resource "aws_instance" "sonar-server" {
     Name        = "Sonar-Server"
     Environment = var.environment
   }
-}
+} */
 }
