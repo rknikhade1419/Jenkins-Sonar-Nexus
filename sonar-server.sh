@@ -1,4 +1,4 @@
-/*#!/bin/bash  
+/* #!/bin/bash  
 
 ###############################################################################################################
 #                   Docker Installation
@@ -23,7 +23,8 @@
 apt update -y
 apt install -y docker.io 
 
-docker run -d -p 9000:9000 --name sonar-server sonarqube:latest*/
+docker run -d -p 9000:9000 --name sonar-server sonarqube:latest */
+
 #!/bin/bash
 # ... (Your Docker install steps) ...
 apt update -y
