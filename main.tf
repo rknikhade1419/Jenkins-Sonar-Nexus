@@ -294,6 +294,7 @@ resource "aws_security_group" "our-Security-Group-for-sonar" { # This will creat
     cidr_blocks = ["0.0.0.0/0"] # anywhere ipv4
     ipv6_cidr_blocks = ["::/0"] # anywhere ipv6
   }
+}
 
 /* ########################################################################################
 # AWS EC2 INSTANCE CREATION (Updated to 7th Gen Flex)
